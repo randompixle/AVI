@@ -42,6 +42,12 @@ BAD_PATTERNS = (
     "let me know if you have any other questions",
     "i am a human",
     "world war",
+    "i'm here to help",
+    "i am here to help",
+    "i'm here to assist",
+    "i am here to assist",
+    "how can i assist you",
+    "how can i help you",
 )
 
 SOCIAL_DEFAULTS = [
@@ -62,6 +68,12 @@ SOCIAL_DEFAULTS = [
     ("why?", "Could you clarify your question?"),
     ("help", "What do you need help with?"),
     ("bye", "Bye."),
+    ("what is a chair?", "A chair is a piece of furniture designed for sitting."),
+    ("what is water?", "Water is a clear liquid made of hydrogen and oxygen."),
+    ("what is a dog?", "A dog is a domesticated animal kept as a pet."),
+    ("what is a computer?", "A computer is a device that processes information."),
+    ("what is a phone?", "A phone is a device used to communicate over distance."),
+    ("what is the sun?", "The Sun is the star at the center of our solar system."),
 ]
 
 
@@ -122,7 +134,7 @@ def iter_oasst_pairs(max_pairs):
         low = assistant.lower()
         if any(p in low for p in BAD_PATTERNS):
             continue
-        if len(assistant.split()) > 25:
+        if len(assistant.split()) > 18:
             continue
         yield (user, assistant)
         count += 1
