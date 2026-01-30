@@ -226,12 +226,19 @@ def main():
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     ckpt = torch.load(BASE_MODEL, map_location=device, weights_only=True)
+    # Allow Colab/T4 overrides via env vars.
+    block_size = int(os.getenv("AVI_BLOCK_SIZE", str(ckpt.get("block_size", 256))))
+    n_embd = int(os.getenv("AVI_N_EMBD", str(ckpt.get("n_embd", 384))))
+    n_head = int(os.getenv("AVI_N_HEAD", str(ckpt.get("n_head", 8))))
+    n_layer = int(os.getenv("AVI_N_LAYER", str(ckpt.get("n_layer", 8))))
+    batch_size = int(os.getenv("AVI_BATCH_SIZE", "6"))
+
     model = TinyGPT(
         vocab_size=ckpt.get("vocab_size", sp.get_piece_size()),
-        block_size=ckpt.get("block_size", 256),
-        n_embd=ckpt.get("n_embd", 384),
-        n_head=ckpt.get("n_head", 8),
-        n_layer=ckpt.get("n_layer", 8),
+        block_size=block_size,
+        n_embd=n_embd,
+        n_head=n_head,
+        n_layer=n_layer,
     ).to(device)
     model.load_state_dict(ckpt["model"])
 
@@ -243,7 +250,7 @@ def main():
     model.train()
     start = time.time()
     for step in range(steps):
-        x, y = get_batch(data, ckpt.get("block_size", 256), 6, device)
+        x, y = get_batch(data, block_size, batch_size, device)
         logits = model(x)
         loss = F.cross_entropy(logits.view(-1, logits.size(-1)), y.view(-1))
         optimizer.zero_grad(set_to_none=True)

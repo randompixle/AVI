@@ -142,11 +142,12 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"device: {device}")
 
-    block_size = 256
-    batch_size = 6
-    n_embd = 384
-    n_head = 8
-    n_layer = 8
+    # Colab/T4-friendly overrides via env vars (keeps root clean and avoids hardcoding).
+    block_size = int(os.getenv("AVI_BLOCK_SIZE", "256"))
+    batch_size = int(os.getenv("AVI_BATCH_SIZE", "6"))
+    n_embd = int(os.getenv("AVI_N_EMBD", "384"))
+    n_head = int(os.getenv("AVI_N_HEAD", "8"))
+    n_layer = int(os.getenv("AVI_N_LAYER", "8"))
 
     model = TinyGPT(
         vocab_size=sp.get_piece_size(),
