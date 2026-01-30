@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+
+# Models / checkpoints
+trained_models/
+*.pt
+*.pth
+*.npz
+*.pkl
+*.model
+*.vocab
+
+# Datasets / caches
+.datasets/
+.hf/
+.cache/
+datasets/
+
+# OS
+.DS_Store
