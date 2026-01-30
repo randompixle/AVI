@@ -158,8 +158,8 @@ def main():
                 "This is a conversation. You are an AI that replies directly and briefly. "
                 "Do not continue articles, do not invent speakers, and do not write anything except the reply."
             )
-            example = "Human says: Hello!\nAI replies: Hi there."
-            prompt = f"{lock}\n\n{example}\n\nHuman says: {user}\nAI replies:"
+            example = "<|user|> Hello!\n<|assistant|> Hi there."
+            prompt = f"{lock}\n\n{example}\n\n<|user|> {user}\n<|assistant|>"
         else:
             prompt = user
 
@@ -184,7 +184,7 @@ def main():
                 break
         _ = time.time() - start
         if use_chat:
-            for stop in ("\nHuman says:", "\nAI replies:", "\n\n"):
+            for stop in ("\n<|user|>", "\n<|assistant|>", "\n\n"):
                 cut = reply.find(stop)
                 if cut > 0:
                     reply = reply[:cut].rstrip()

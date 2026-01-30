@@ -48,6 +48,13 @@ BAD_PATTERNS = (
     "i am here to assist",
     "how can i assist you",
     "how can i help you",
+    "open assistant",
+    "i'm here to help",
+    "i am here to help",
+    "i'm here to assist",
+    "i am here to assist",
+    "is there anything else i can help",
+    "is there anything else i can assist",
 )
 
 SOCIAL_DEFAULTS = [
@@ -136,6 +143,8 @@ def iter_oasst_pairs(max_pairs):
             continue
         if len(assistant.split()) > 18:
             continue
+        if " = = =" in assistant or "==" in assistant:
+            continue
         yield (user, assistant)
         count += 1
         if max_pairs is not None and count >= max_pairs:
@@ -175,7 +184,7 @@ def build_stream(sp, max_raw, max_chat, chat_ratio=0.1):
             stream.append(sp.piece_to_id("\n"))
         else:
             u, a = item
-            text = f"Human says: {u}\nAI replies: {a}\n"
+            text = f"<|user|> {u}\n<|assistant|> {a}\n"
             stream.extend(sp.encode(text, out_type=int))
             stream.append(sp.piece_to_id("\n"))
         seen += 1
@@ -188,7 +197,7 @@ def build_stream(sp, max_raw, max_chat, chat_ratio=0.1):
     print()
     # Inject a tiny social-default set so greetings don't drift into encyclopedia tone.
     for u, a in SOCIAL_DEFAULTS:
-        text = f"Human says: {u}\nAI replies: {a}\n"
+        text = f"<|user|> {u}\n<|assistant|> {a}\n"
         stream.extend(sp.encode(text, out_type=int))
         stream.append(sp.piece_to_id("\n"))
     return torch.tensor(stream, dtype=torch.long)
