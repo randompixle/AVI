@@ -20,6 +20,9 @@ OASST_GZ = os.path.join("datasets", "OpenAssistant", "2023-04-12_oasst_ready.mes
 OASST_PATH = OASST_JSONL if os.path.exists(OASST_JSONL) else OASST_GZ
 
 WIKITEXT_DATASET = ("wikitext", "wikitext-103-raw-v1")
+CACHE_DIR = os.path.join(MODEL_DIR, "cache")
+CACHE_TOKENS = os.path.join(CACHE_DIR, "finetune_tokens.pt")
+CACHE_META = os.path.join(CACHE_DIR, "finetune_tokens.meta")
 
 BAD_PATTERNS = (
     "as an ai",
@@ -207,6 +210,23 @@ def build_stream(sp, max_raw, max_chat, chat_ratio=0.1):
     return torch.tensor(stream, dtype=torch.long)
 
 
+def load_or_build_stream(sp, max_raw, max_chat, chat_ratio, block_size):
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    meta = f"raw={max_raw}|chat={max_chat}|ratio={chat_ratio}|vocab={sp.get_piece_size()}|block={block_size}"
+    if os.path.exists(CACHE_TOKENS) and os.path.exists(CACHE_META):
+        try:
+            with open(CACHE_META, "r", encoding="utf-8") as f:
+                if f.read().strip() == meta:
+                    return torch.load(CACHE_TOKENS)
+        except OSError:
+            pass
+    data = build_stream(sp, max_raw, max_chat, chat_ratio=chat_ratio)
+    torch.save(data, CACHE_TOKENS)
+    with open(CACHE_META, "w", encoding="utf-8") as f:
+        f.write(meta)
+    return data
+
+
 def get_batch(data, block_size, batch_size, device):
     ix = torch.randint(0, len(data) - block_size - 1, (batch_size,))
     x = torch.stack([data[i : i + block_size] for i in ix]).to(device)
@@ -247,7 +267,7 @@ def main():
     model.load_state_dict(ckpt["model"])
 
     print("building mixed stream...")
-    data = build_stream(sp, max_raw, max_chat, chat_ratio=chat_ratio)
+    data = load_or_build_stream(sp, max_raw, max_chat, chat_ratio, block_size)
     print(f"token stream size: {len(data)}")
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
