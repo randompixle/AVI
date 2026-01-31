@@ -9,4 +9,4 @@ export AVI_N_HEAD=${AVI_N_HEAD:-8}
 export AVI_N_LAYER=${AVI_N_LAYER:-8}
 
 # Light chat finetune (default 5% chat)
-python3 finetune_chat.py 20000 95000 5000 0.05
+PYTHONUNBUFFERED=1 python3 finetune_chat.py 20000 95000 5000 0.05

@@ -189,6 +189,10 @@ def main():
                 if cut > 0:
                     reply = reply[:cut].rstrip()
                     break
+            # Cut heading-like junk that sometimes appears in WikiText.
+            head = reply.find("==")
+            if head > 0:
+                reply = reply[:head].rstrip()
             reply = reply.lstrip(" \t\n-:;,.\"'()`")
             print(f"bot> {reply}\n")
         else:

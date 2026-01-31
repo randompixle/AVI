@@ -9,4 +9,4 @@ export AVI_N_HEAD=${AVI_N_HEAD:-8}
 export AVI_N_LAYER=${AVI_N_LAYER:-8}
 
 # Train base completion model
-python3 train.py 30000 12000 120000
+PYTHONUNBUFFERED=1 python3 train.py 30000 20000 300000

@@ -36,6 +36,7 @@ BAD_PATTERNS = (
     "i cannot",
     "i don't know",
     "i do not know",
+    "not sure",
     "how can i assist",
     "how may i help",
     "any other questions",
@@ -94,6 +95,9 @@ def iter_wikitext(max_samples):
     for row in ds:
         text = row.get("text", "").strip()
         if not text:
+            continue
+        # Drop WikiText section headings and markup that leak into chat.
+        if "==" in text or "= = =" in text:
             continue
         yield text
         count += 1
